@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="{{ .Description }}">
+	<meta name="keywords" content="{{ .Keywords }}">
+	<meta name="author" content="{{ .Author }}">
+
+	<title>{{ .Title }}</title>
+
+	{{ range $index, $cssFileLocation := .CssFiles }}
+	<link rel="stylesheet" type="text/css" href="{{ $cssFileLocation }}">
+	{{ end }}
+
+	{{ range $index, $jsFileLocation := .JsFiles }}
+	<script src="{{ $jsFileLocation }}"></script>
+	{{ end }}
+
+	{{ .CssScript }}
+	
+</head>
+
+<header>
+    <div class="main-nav">
+        <nav>
+			<ul>
+				<li><a href="/"/>Home</a></li>
+				<li><a href="/excel"/>Excel App</a></li>
+				<li><a href="/qr-code-generator"/>QR Code Generator</a></li>
+				<li><a href="/svg">SVG Example</a></li>
+				<li><a href="/sphere"/>Sphere</a></li>
+			</ul>
+        </nav>
+    </div>
+</header>
+
+<body>
+	{{ .BodyContent }}
+</body>
+
+{{ .JsScript }}
+
+</html> 

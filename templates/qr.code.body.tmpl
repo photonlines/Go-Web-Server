@@ -1,0 +1,16 @@
+<div class = "main-content">
+    <h2>QR Code Generator</h2>
+    <form action="/qr-code-generator" name="qr_code_form" method="GET">
+        <input maxLength=512 size=80 name="qr_code_text" value="" title="Text to QR Encode">
+        <br>
+        <input type=submit value="Show QR" name="qr_code_submission">
+        <br>
+        {{if .QRCode}}
+            <img src="http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=UTF-8&chl={{.QRCode}}"/>
+            <br>
+            {{.QRCode}}
+            <br>
+            <br>
+        {{end}}
+    </form>
+</div>
