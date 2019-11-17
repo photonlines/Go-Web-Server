@@ -1,6 +1,6 @@
 ### Demo
 
-![Demo](demo\demo.gif)
+![Demo](https://media.giphy.com/media/RfpTJSIxEX764WDsyT/giphy.gif)
 
 ### Description
 
