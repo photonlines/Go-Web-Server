@@ -1,6 +1,8 @@
 ### Demo
 
-![Demo](https://media.giphy.com/media/RfpTJSIxEX764WDsyT/giphy.gif)
+<p align="center">
+  <img src="https://media.giphy.com/media/RfpTJSIxEX764WDsyT/giphy.gif" style="width:800px;height:500px;">
+</p>
 
 ### Description
 
