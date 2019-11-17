@@ -17,4 +17,4 @@ It also includes a few demo applications, including:
 
 
 
-I've included all of the raw template / html / css files in the actual server code (main.go), but you can find the raw files which can be used to generate the pages and templates within the js / css / templates sub-folders.
+I've included all of the raw template / html / css in the actual server code (main.go), but you can find the raw files which can be used to generate the pages and templates within the js / css / templates sub-folders.
