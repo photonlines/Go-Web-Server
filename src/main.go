@@ -1,4 +1,5 @@
-// Simple golang webserver with logging, tracing, health check, and graceful shutdown.
+// Simple golang webserver with logging, tracing, health check, graceful shutdown, as well
+// as demo applications
 
 package main
 
@@ -82,8 +83,7 @@ func main() {
 	// gracefully
 	signal.Notify(quitChannel, os.Interrupt, syscall.SIGTERM)
 
-	// Create and execute a function which handles unexpected interrupts / shutdowns
-	// and which gets triggered via our quit channel:
+	// Create and execute a function which handles unexpected interrupts / shutdowns:
 	go func() {
 		// Trigger when our quit channel receives a signal
 		<-quitChannel
@@ -97,15 +97,15 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		// Dissable HTTP keep-alives
+		// Disable HTTP keep-alives
 		server.SetKeepAlivesEnabled(false)
 
-		// Gracefully shuts down the server without interrupting any active connections.The
+		// Gracefully shut down the server without interrupting any active connections.The
 		// shutdown function works by first closing all open listeners, then closing all idle
-		// connections, and then waiting indefinitely for connections to return to idle and
-		// then shut down.
+		// connections, and then waiting indefinitely for connections to return to an idle
+		// state. Afterwards, it can be shut down.
 		if err := server.Shutdown(ctx); err != nil {
-			// If we encounter an issue with our shutdown, we log it along with the error:
+			// If we encounter an issue with our shutdown, we log it along with the error
 			logger.Fatalf("Could not gracefully shutdown the server: %v\n", err)
 		}
 
@@ -149,8 +149,8 @@ func routeHandler() *http.ServeMux {
 
 }
 
-// Type which is used to pass in the required data into our html templates in order to
-// construct our applications / pages.
+// HTML data element which is used to pass in the required data we want to include in our
+// applications / html templates.
 type HtmlData struct {
 	Title       string
 	Description string
@@ -165,8 +165,9 @@ type HtmlData struct {
 
 // This is our main CSS script. Currently, we pass this into our template each time we
 // construct one. Ideally, this should be a nested template or file which is included
-// as part of our main template - the only reason this is here is to demo functionality.
-// You can also find the raw CSS file (called style.css) in the css folder.
+// as part of our main template. The only reason the raw data is included here is to
+// make the code more readable. You can find the raw CSS file (called style.css) in the
+// css folder.
 const MAIN_CSS_TEMPLATE = `
 <style>
 
@@ -300,9 +301,10 @@ const MAIN_CSS_TEMPLATE = `
 </style>
 `
 
-// This is our main HTML template used to construct our web applications. Ideally, this should be read
-// read in from a template file stored in our templates folder, but we include the full template
-// string here for readability purposes. You can also find the template file in the templates folder.
+// This is our main HTML template which is used to construct our web applications. Ideally, this
+// should be read in from a template file stored in our templates folder, but we include the full
+// string here for readability purposes. You can find the template file in the templates folder -
+// it's called main.tmpl.
 const MAIN_HTML_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
@@ -350,7 +352,8 @@ const MAIN_HTML_TEMPLATE = `
 </html> 
 `
 
-// Our main index handler with intro and description of basic functionality and libraries used
+// Our main index handler. This page displays basic intro text with a description of basic
+// functionality and the libraries we use to construct our demo applications.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
@@ -461,9 +464,9 @@ func excelHandler(w http.ResponseWriter, r *http.Request) {
 func qrCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	// This is a template string we use to construct our body content. We check to see if we have a
-	// defined QR code, and if so, we use the Google API for fetching the WR code image. If no
+	// defined QR code, and if so, we use the Google API for fetching the QR code image. If no
 	// QR code is input, we don't display anything. You can find the raw template file in the
-	// templates sub-directory titled qr.code.body.
+	// templates sub-directory titled qr.code.body.tmpl.
 	var bodyHtmlTemplate = `
 	 <div class = "main-content">
 		<h2>QR Code Generator</h2>	
@@ -497,7 +500,7 @@ func qrCodeHandler(w http.ResponseWriter, r *http.Request) {
 	bodyTemplate, err := template.New("qr.code.generator.body").Parse(bodyHtmlTemplate)
 
 	// Since we don't want to pass in our HTML to our response writer quite yet, we store
-	// the template \ tpl file results in memory via a bytes buffer
+	// the template file results in memory via a bytes buffer
 	var tpl bytes.Buffer
 
 	if err := bodyTemplate.Execute(&tpl, data); err != nil {
@@ -535,22 +538,22 @@ func qrCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Variables for handling SVG drawing:
+// Variables for handling our SVG drawing:
 
 const (
 	canvasWidth, canvasHeight = 800, 500
 	numGridCells              = 100
-	xyAxisRange               = 30.0                          // axis ranges
-	xyScale                   = canvasWidth / 2 / xyAxisRange // pixels per x or y unit
-	zScale                    = canvasHeight * 0.4            // pixels per z unit
-	angle                     = math.Pi / 6                   // angle of x, y axes (=30°)
+	xyAxisRange               = 30.0                          // Axis ranges
+	xyScale                   = canvasWidth / 2 / xyAxisRange // Pixels per x or y unit
+	zScale                    = canvasHeight * 0.4            // Pixels per z unit
+	angle                     = math.Pi / 6                   // Angle of x, y axes (=30°)
 )
 
 var sin30, cos30 = math.Sin(angle), math.Cos(angle) // sin(30°), cos(30°)
 
 // This is our SVG drawing demo application. It computes an SVG rendering of a 3-D surface
-// function. In our case below, we show an SVG rendering of n sin(r)/r, where r is sqrt(x*x+y*y)
-// Original example take from the book 'The Go Programming Langauge' and you can find it
+// function. In our case below, we show an SVG rendering of sin(r)/r, where r is sqrt(x*x+y*y)
+// The original example was taken from the book 'The Go Programming Langauge' and you can find it
 // here: https://github.com/adonovan/gopl.io/blob/master/ch3/surface/main.go
 func svgHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -764,7 +767,7 @@ const THREE_JS_SPHERE_SCRIPT = `
 // This is a handler used to display a rotating sphere using THREE.js
 func sphereHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Let's create the data elements we'll use to pass into our main template file
+	// Let's create the data elements we'll pass into our main template file
 	htmlData := HtmlData{
 		Title:       "Golang THREE.js Rotating Sphere",
 		Description: "Simple golang THREE.js rotating sphere.",
@@ -805,11 +808,10 @@ func sphereHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// This is our log handler. It simply outputs our log file content to the response writer
+// This is our log handler. It simply outputs our log file contents to the response writer
 func logHandler(w http.ResponseWriter, r *http.Request) {
 
-	// The below header settings prevent "mime" based attacks. You can find more info here:
-	// https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
+	// The below header settings prevent "mime" based attacks.
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(http.StatusOK)
@@ -830,7 +832,7 @@ func logHandler(w http.ResponseWriter, r *http.Request) {
 // Report server status
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	// Check our health state indicator, and if it's not OK, we return a status indicating that
-	// our service is unavailable -- otherwise, we return a header with a 204 response code
+	// our service is unavailable. Otherwise, we return a header with a 204 response code.
 	if atomic.LoadInt32(&healthy) == 1 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -842,12 +844,12 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func loggingHandler(logger *log.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Middleware layer we use to do our logging - in this instance, we defer
-			// execution to perform our logging after our main handler finishes doing
-			// its job
+			// Middleware layer we use to do our logging. In this instance, we defer
+			// its execution to perform logging only after our main handler finishes
+			// executing.
 			defer func() {
 				requestID, ok := r.Context().Value(REQUEST_ID_KEY).(string)
-				// Do we know which request we're handling?
+				// Check to see if we know which request we're handling
 				if !ok {
 					requestID = "UNKNOWN"
 				}
